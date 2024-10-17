@@ -22,6 +22,5 @@ int fpgaDecoding(int number);
 // on the rightmost 7-segment depending on the value.
 int displayOn7Segment(int number);
 
-
 // This is the end of the hardware header definition.
 #endif
