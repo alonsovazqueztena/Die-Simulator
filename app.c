@@ -20,7 +20,7 @@ void start()
     // This character seeks to store the user input for rolling or exiting.
     char input;    
 
-    // This is the welcome message and the instructions the user must follow.
+    // This is the welcome message.
     printf("Welcome to the Die Simulator!\n\n");
 
     // This is the main loop to keep the program running until the user exits.
