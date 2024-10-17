@@ -1,0 +1,67 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "make",
+            "args": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"],
+            "detail": "Generated task for building the project using Makefile"
+        },
+        {
+            // This transfers the built file to the board 
+            "label": "Transfer",
+            "type": "shell",
+            "command": "scp ${config:WorkspacePath}/${config:OutputFile} root@192.168.1.123:${config:BoardLocation}",
+            "problemMatcher": []
+        },
+        {
+            //This starts the gdbserver 
+            "label": "Start gdbserver",
+            "type": "shell",
+            "command": "ssh root@192.168.1.123 'chmod +x ${config:BoardLocation}/${config:OutputFile} && gdbserver localhost:2000 ${config:BoardLocation}/${config:OutputFile}'",
+            "isBackground": true,
+            "presentation": {
+              "echo": true,
+              "reveal": "always",
+              "focus": true,
+              "panel": "new"
+            },
+            "problemMatcher": [
+                {
+                    "pattern": [
+                        {
+                        "regexp": ".",
+                        "file": 1,
+                        "location": 2,
+                        "message": 3
+                        }
+                    ],
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": ".",
+                        "endsPattern": ".",
+                    }
+                }
+            ]
+        },
+        {
+            "label": "Wait for gdbserver",
+            "type": "shell",
+            "command": "sleep 2", // This delay is to make sure the gdbserver starts before the debugger starts
+            "problemMatcher": []
+        },
+        {
+            "label": "Build, Transfer, and Start gdbserver",
+            "dependsOn": ["build", "Transfer", "Start gdbserver", "Wait for gdbserver"],
+            "dependsOrder": "sequence",
+            "problemMatcher": []
+        }          
+    ]
+}
+

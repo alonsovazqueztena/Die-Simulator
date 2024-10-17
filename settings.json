@@ -1,0 +1,7 @@
+{
+    //This is the Workspace path in unix format change to match your path to folder from the SOC terminal
+    "WorkspacePath": "C:/Users/alons/.vscode/Milestone2",
+    //This is the binary file name that get made in the Makefile
+    "OutputFile": "milestone2",
+    "BoardLocation": "/home/root/"
+}

@@ -1,0 +1,46 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug (GDB)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/${config:OutputFile}",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            //This is the path to the linaro gdb.exe it may be different for your pc
+            "miDebuggerPath": "c:/Program Files (x86)/Linaro/gcc-linaro-arm-linux-gnueabihf-4.8-2014.04/bin/arm-linux-gnueabihf-gdb.exe",
+            "setupCommands": [
+                {
+                    "description": "Set target",
+                    "text": "target remote 192.168.1.123:2000",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set architecture",
+                    "text": "set architecture arm",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build, Transfer, and Start gdbserver",
+            "internalConsoleOptions": "openOnSessionStart",
+            "logging": {
+                "moduleLoad": false,
+                "trace": false,
+                "engineLogging": false,
+                "programOutput": true,
+                "exceptions": true,
+                "traceResponse": false
+            }
+        }
+    ]
+}
