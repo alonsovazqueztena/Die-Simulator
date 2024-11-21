@@ -1,82 +1,59 @@
 // Alonso Vazquez Tena
-// October 13, 2024
-// Milestone 2: Embedded Application Release 1
+// November 20, 2024
+// Milestone 3: Embedded Application Release 2
 // This is my own work.
 
-// We must include these libraries for its utilities.
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+#include <unistd.h>
 
-// We must include the header files for app and hardware-related functions.
-#include "app.h"
+// We must include the header file for hardware-related functions.
 #include "hardware.h"
 
-// This function starts the die simulator.
-void start()
-{
-    // This integer seeks to store the result of the die roll.
-    int result;    
-
-    // This character seeks to store the user input for rolling or exiting.
-    char input;    
-
-    // This is the welcome message.
-    printf("Welcome to the Die Simulator!\n\n");
-
-    // This is the main loop to keep the program running until the user exits.
-    do
-    {
-        // These are the instructions the user must follow.
-        printf("Please press 'R' to roll or press 'Q' to exit program!\n\n");
-
-        // This reads a character input from the user.
-        input = getchar();  
-
-        // This checks if the user pressed the 'r' key to roll the die.
-        if(input == 'r' || input == 'R')
-        {
-            // This lets the user know what key button was detected as pressed.
-            printf("\nKey button 'r' is pressed!\n\n");
-
-            // This calls the roll function to get a die result.  
-            result = roll();
-
-            // This shows to the user was number was rolled.
-            printf("%d was rolled!\n\n", result);
-
-            // This sends the result to the FPGA for decoding.
-            sendToFPGA(result);
-
-            // This calls for the result to be decoded.
-            fpgaDecoding(result);
-
-            // This calls for the decoded result to be displayed to the rightmost 7-segment.
-            displayOn7Segment(result);
-        }
-        // This checks if the user pressed the 'q' key to quit the program.
-        else if(input == 'q' || input == 'Q')
-        {
-            // This lets the user know what key button was detected as pressed.
-            printf("\nKey button 'q' is pressed!\n\n");
-            // This exits the loop.
-            break;  
-        }
-            
-        // This loop consumes any extra input.
-        while((input = getchar()) != '\n' && input != EOF) {}
-
-    // This creates an infinite loop, breaks only when the user presses the 'q' key to exit.
-    } while (1);
-}
-
+// This main function will hold all the application logic.
 int main()
 {
-    // This starts the die simulator.
-    start(); 
+    // These variables will serve as the states that will take in
+    // the results of the rolls and the exit flag respectively.
+    int result, exit;
 
-    // This informs the user that the program is exiting.
-    printf("Bye bye! Exiting the program...\n\n");  
+    // This seeds the random number generator.
+    srand(time(NULL));
 
-    // This returns when the program has successfully terminated.
+    // This initializes the hardware.
+    if (initializeHardware() == -1)
+        return -1;
+
+    // This is the welcome message and the instructions.
+    printf("Welcome to the Die Simulator!\n\n");
+    printf("Please press KEY3 to roll the die, or KEY2 to exit the program!\n\n");
+
+    while (1)
+    {
+        // This checks for any key presses and reads the status for the results and exit flag.
+        pollKeys();
+        readHardwareStatus(&result, &exit);
+
+        // If the exit button has been pressed, the program exits the loop.
+        if (exit)
+        {
+            printf("Bye bye! Exiting the program...\n\n");
+            break;
+        }
+
+        // If the roll button has been pressed, the program displays what number was rolled.
+        if (result != 0)
+        {
+            printf("%d was rolled!\n\n", result);
+            result = 0;
+        }
+
+        // This is a small delay to reduce CPU usage.
+        usleep(100000);
+    }
+
+    // This cleans up the hardware processes before exiting the program.
+    cleanupHardware();
     return EXIT_SUCCESS;
 }

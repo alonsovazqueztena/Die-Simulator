@@ -1,29 +1,23 @@
-TARGET = dieApp
-
-ALT_DEVICE_FAMILY ?= soc_cv_av
-SOCEDS_ROOT ?= $(SOCEDS_DEST_ROOT)
-HWLIBS_ROOT = $(SOCEDS_ROOT)/ip/altera/hps/altera_hps/hwlib
-
+# These are the user-space app variables.
+TARGET_APP = dieApp
+APP_OBJS = app.o hardware.o
 CROSS_COMPILE = arm-linux-gnueabihf-
-
-CFLAGS = -g -Wall -std=c99 -DDEBUG -D$(ALT_DEVICE_FAMILY) -I$(HWLIBS_ROOT)/include/$(ALT_DEVICE_FAMILY) -I$(HWLIBS_ROOT)/include/
-
-LDFLAGS = -g -Wall 
-
 CC = $(CROSS_COMPILE)gcc
+CFLAGS = -g -Wall -std=c99 -DDEBUG
+LDFLAGS = -g -Wall
 
-ARCH = arm
+# The default target builds the user-space application.
+.PHONY: all
+all: $(TARGET_APP)
 
-OBJS = app.o hardware.o
+# This builds the user-space application.
+$(TARGET_APP): $(APP_OBJS)
+	$(CC) $(LDFLAGS) $^ -o $@
 
-build: $(TARGET)
-
-$(TARGET): $(OBJS)
-	$(CC) $(LDFLAGS) $^ -o $@ 
-
-%.o : %.c
+%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+# This cleans the application.
 .PHONY: clean
 clean:
-	rm -f $(TARGET) *.a *.o *~
+	rm -f $(TARGET_APP) *.o
