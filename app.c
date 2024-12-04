@@ -1,6 +1,6 @@
 // Alonso Vazquez Tena
-// November 20, 2024
-// Milestone 3: Embedded Application Release 2
+// December 1, 2024
+// Milestone 4: Embedded Application Release 3
 // This is my own work.
 
 #include <stdio.h>
@@ -11,49 +11,61 @@
 // We must include the header file for hardware-related functions.
 #include "hardware.h"
 
+// These constants are defined as the possible return values for
+// the pollKeys function.
+#define DIE_ROLLED 1
+#define EXIT_REQUEST 2
+
 // This main function will hold all the application logic.
 int main()
 {
-    // These variables will serve as the states that will take in
-    // the results of the rolls and the exit flag respectively.
-    int result, exit;
+
+    // This creates a hardware context to handle the hardware state.
+    HardwareContext context;
+
+    // This variable will hold the roll result.
+    int result;
 
     // This seeds the random number generator.
     srand(time(NULL));
 
     // This initializes the hardware.
-    if (initializeHardware() == -1)
-        return -1;
+    if (initializeHardware(&context) == -1)
+        return EXIT_FAILURE;
 
     // This is the welcome message and the instructions.
     printf("Welcome to the Die Simulator!\n\n");
-    printf("Please press KEY3 to roll the die, or KEY2 to exit the program!\n\n");
+    printf("Please press and hold KEY3 to roll the die, or KEY2 to exit the program!\n\n");
 
     while (1)
     {
-        // This checks for any key presses and reads the status for the results and exit flag.
-        pollKeys();
-        readHardwareStatus(&result, &exit);
+        // This polls for the key presses and determines what
+        // actions to take based on the user input.
+        int userInput = pollKeys(&context, &result);
 
-        // If the exit button has been pressed, the program exits the loop.
-        if (exit)
+        switch (userInput)
         {
-            printf("Bye bye! Exiting the program...\n\n");
-            break;
-        }
 
-        // If the roll button has been pressed, the program displays what number was rolled.
-        if (result != 0)
-        {
+        // If the roll button has been pressed, the program
+        // will roll the die and display it to the user.
+        case DIE_ROLLED:
             printf("%d was rolled!\n\n", result);
-            result = 0;
+            break;
+
+        // If the exit button has been pressed, the program exits the loop
+        // and terminates.
+        case EXIT_REQUEST:
+            printf("Bye bye! Exiting the program...\n\n");
+            cleanupHardware(&context);
+            return EXIT_SUCCESS;
+
+        // This continues the loop, meanwhile a user input is
+        // sought for.
+        default:
+            break;
         }
 
         // This is a small delay to reduce CPU usage.
         usleep(100000);
     }
-
-    // This cleans up the hardware processes before exiting the program.
-    cleanupHardware();
-    return EXIT_SUCCESS;
 }

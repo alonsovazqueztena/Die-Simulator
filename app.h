@@ -1,6 +1,6 @@
 // Alonso Vazquez Tena
-// November 20, 2024
-// Milestone 3: Embedded Application Release 2
+// December 1, 2024
+// Milestone 4: Embedded Application Release 3
 // This is my own work.
 
 // We are defining the app header file here to ensure we declare the necessary functions.
